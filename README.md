@@ -67,7 +67,7 @@ and you are at project root, you can run:
 ```sh
 # This requires that you have run the build commands like in the
 # *build and run* section at least once! This would not work otherwise!
-cmake build/
+cmake --build build/
 ```
 
 Once you're satisfied, commit the changes to your local branch,
