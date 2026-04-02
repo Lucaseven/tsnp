@@ -46,8 +46,31 @@ That's it! Move it around, move it into your `bin` directory, whatever.
 To contribute to tsnp, make sure you have performed the entire 4 steps
 in [Build and run](#build-and-run-instructions).
 
-If the program runs properly, feel free to make any changes to the files
-in `src`. Once you're satisfied, commit the changes to your local branch,
+If the program runs properly, feel free to make any changes to the project.
+To shortly build the project again for testing after making changes, simply 
+point `cmake` at the `build` directory. For example, if this is your project
+structure:
+
+```
+<project root>
+├── CMakeLists.txt
+├── build
+│   ├── tsnp
+│   ...
+└── src
+    ├── CMakeLists.txt
+    ├── main.cpp
+    ...
+```
+and you are at project root, you can run:
+
+```sh
+# This requires that you have run the build commands like in the
+# *build and run* section at least once! This would not work otherwise!
+cmake build/
+```
+
+Once you're satisfied, commit the changes to your local branch,
 and then open a PR. We'll review the PR hopefully in just a few days from
 it being open.
 
