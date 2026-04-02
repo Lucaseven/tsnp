@@ -1,3 +1,5 @@
-cmake_minimum_required(VERSION 3.15)
-project(tsnp)
-add_executable(tsnp test.cpp)
+qt_add_executable(tsnp
+    main.cpp
+)
+
+target_link_libraries(tsnp PRIVATE Qt6::Core)

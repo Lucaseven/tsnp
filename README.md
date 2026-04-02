@@ -1,5 +1,4 @@
 # tsnp
-===
 ### Introduction
 tsnp is an attempt at making a no-fluff, no-nonsense MS Paint clone
 art program for Unix-like machines. This is a shared project for learning
@@ -16,6 +15,7 @@ as the project progresses.
 - Version control: `git`
 - Build system (generator): `cmake`
 - A working C++ compiler: `gcc` or `clang`
+- Libraries: `qt6` (very important that it is 6 specifically!)
 
 ### Build and run instructions
 
@@ -30,7 +30,7 @@ cd tsnp
 
 3. Build the program using the following commands (run them all first):
 ```
-cmake -B build/ -S src/
+cmake -B build/ -S .
 cmake --build build/
 ```
 
