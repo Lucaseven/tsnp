@@ -1,19 +1,17 @@
+// src/canvas/CanvasWidget.cpp
 #include "CanvasWidget.h"
-
 #include <QPainter>
-#include <QPaintEvent>
+#include <QMouseEvent>
 
-CanvasWidget::CanvasWidget(int width, int height, QWidget *parent)
+CanvasWidget::CanvasWidget(int width, int height, QWidget* parent)
     : QWidget(parent)
-    // ARGB32_Premultiplied is the fastest format for QPainter operations.
-    // We'll use this throughout the project for all layer buffers.
     , m_canvas(width, height, QImage::Format_ARGB32_Premultiplied)
 {
     initCanvas();
-
-    // Fix the widget size to match the canvas resolution.
-    // The scroll area in MainWindow handles overflow.
     setFixedSize(width, height);
+
+    // Required for Qt to send mouseMoveEvent while button is held
+    setMouseTracking(false);
 }
 
 void CanvasWidget::initCanvas()
@@ -21,19 +19,57 @@ void CanvasWidget::initCanvas()
     clear(Qt::white);
 }
 
-void CanvasWidget::clear(const QColor &color)
+void CanvasWidget::clear(const QColor& color)
 {
     m_canvas.fill(color);
-    update(); // schedule a repaint
+    update();
 }
 
-void CanvasWidget::paintEvent(QPaintEvent *event)
+// Converts a QMouseEvent into your own InputEvent struct.
+// This is the only place in the project that touches QMouseEvent directly.
+InputEvent CanvasWidget::buildInputEvent(QMouseEvent* event) const
 {
-    Q_UNUSED(event);
+    InputEvent ev;
+    ev.pos      = event->position();  // current position
+    ev.lastPos  = m_lastPos;          // previous position
+    ev.pressure = 1.0f;               // mouse always full pressure
+    return ev;
+}
 
+void CanvasWidget::mousePressEvent(QMouseEvent* event)
+{
+    if (!m_activeTool) return;
+    if (event->button() != Qt::LeftButton) return;
+
+    m_lastPos = event->position();    // initialise before building event
+    InputEvent ev = buildInputEvent(event);
+    m_activeTool->onPress(m_canvas, ev, m_brush);
+    update(); // schedule repaint
+}
+
+void CanvasWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (!m_activeTool) return;
+    if (!(event->buttons() & Qt::LeftButton)) return;
+
+    InputEvent ev = buildInputEvent(event);
+    m_activeTool->onDrag(m_canvas, ev, m_brush);
+    m_lastPos = event->position();    // update after building event
+    update();
+}
+
+void CanvasWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (!m_activeTool) return;
+    if (event->button() != Qt::LeftButton) return;
+
+    InputEvent ev = buildInputEvent(event);
+    m_activeTool->onRelease(m_canvas, ev, m_brush);
+    update();
+}
+
+void CanvasWidget::paintEvent(QPaintEvent*)
+{
     QPainter painter(this);
-
-    // Draw the canvas image onto the widget surface.
-    // As we add zoom later, we'll apply a transform here.
     painter.drawImage(0, 0, m_canvas);
 }
